@@ -10,8 +10,11 @@ struct OneDayView: View {
     @State private var userId: UUID?
     @FetchRequest(entity: Category.entity(), sortDescriptors: []) private var categories: FetchedResults<Category>
 
-    @State private var showTextFieldForCategory: Category? // Track the category showing TextField for new task
-    @State private var todoText: String = "" // Text entered in the TextField
+    @State private var showTextFieldForCategory: Category?
+    @State private var todoText: String = ""
+    
+    @State private var editingTask: Status?
+    @State private var editedTaskTitle: String = ""
 
     var body: some View {
         NavigationView {
@@ -55,16 +58,16 @@ struct OneDayView: View {
                                     .foregroundColor(.primary)
                             }
                             .disabled(isJanuary2024())
-                            
+
                             Spacer()
-                            
+
                             Text(monthTitle(for: currentMonth))
                                 .font(Font.custom("SDSamliphopangcheTTFOutline", size: 30, relativeTo: .largeTitle))
                                 .fontWeight(.bold)
                                 .padding()
-                            
+
                             Spacer()
-                            
+
                             Button(action: nextMonth) {
                                 Image(systemName: "chevron.right")
                                     .foregroundColor(.primary)
@@ -106,16 +109,27 @@ struct OneDayView: View {
                                                 Image(systemName: isTaskCompleted(for: task) ? "checkmark.square.fill" : "checkmark.square")
                                                     .foregroundColor(.primary)
                                             }
-                                            
-                                            Text(task.title ?? "")
-                                                .foregroundColor(.primary)
-                                            
+
+                                            if editingTask == task {
+                                                TextField("할 일 수정", text: $editedTaskTitle, onCommit: {
+                                                    saveEditedTask()
+                                                })
+                                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            } else {
+                                                Text(task.title ?? "")
+                                                    .foregroundColor(.primary)
+                                            }
+
                                             Spacer()
-                                            
+
                                             Button(action: {
-                                                // Action for modify
+                                                if editingTask == task {
+                                                    saveEditedTask()
+                                                } else {
+                                                    startEditingTask(task)
+                                                }
                                             }) {
-                                                Image(systemName: "ellipsis")
+                                                Image(systemName: editingTask == task ? "checkmark" : "ellipsis")
                                                     .foregroundColor(.primary)
                                             }
                                         }
@@ -130,7 +144,7 @@ struct OneDayView: View {
                                                 TextField("할 일 입력", text: $todoText)
                                                     .textFieldStyle(PlainTextFieldStyle())
                                                     .padding(.bottom, 4)
-                                                    .submitLabel(.done) // Set return key to "Done"
+                                                    .submitLabel(.done)
                                                     .onSubmit {
                                                         saveTask(for: category)
                                                     }
@@ -138,13 +152,13 @@ struct OneDayView: View {
                                                 Divider()
                                                     .background(Color.gray)
                                             }
-                                            
+
                                             Spacer()
 
                                             Button(action: {
-                                                // Action for modify
+                                                saveTask(for: category)
                                             }) {
-                                                Image(systemName: "ellipsis")
+                                                Image(systemName: "plus")
                                                     .foregroundColor(.primary)
                                             }
                                         }
@@ -156,7 +170,7 @@ struct OneDayView: View {
                         }
                     }
                     .padding()
-                    
+
                     NavigationLink(destination: AddCategoryView(), tag: "AddCategory", selection: $navigateTo) { EmptyView() }
                     NavigationLink(destination: CategoryManagerView(), tag: "CategoryManager", selection: $navigateTo) { EmptyView() }
                     NavigationLink(destination: ClockTimeView(), tag: "ClockTime", selection: $navigateTo) { EmptyView() }
@@ -165,19 +179,19 @@ struct OneDayView: View {
             .onAppear {
                 currentMonth = getCurrentMonth()
                 trackUserID()
-                selectTodayDate() // Select today's date when the view appears
+                selectTodayDate()
             }
         }
     }
-    
+
     private var isTestUser: Bool {
         return userId == UUID(uuidString: "12345678-1234-1234-1234-1234567890ab")
     }
-    
+
     private func trackUserID() {
         let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
         fetchRequest.fetchLimit = 1
-        
+
         do {
             let users = try viewContext.fetch(fetchRequest)
             if let existingUser = users.first {
@@ -186,7 +200,7 @@ struct OneDayView: View {
                 let newUser = User(context: viewContext)
                 newUser.id = UUID()
                 userId = newUser.id
-                
+
                 try viewContext.save()
             }
         } catch {
@@ -199,24 +213,24 @@ struct OneDayView: View {
         let components = Calendar.current.dateComponents([.year, .month], from: now)
         return Calendar.current.date(from: components)!
     }
-    
+
     func monthTitle(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy년 M월"
         return formatter.string(from: date)
     }
-    
+
     func previousMonth() {
         if !isJanuary2024() {
             currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth)!
         }
     }
-    
+
     func nextMonth() {
         currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth)!
     }
-    
+
     func isJanuary2024() -> Bool {
         let components = Calendar.current.dateComponents([.year, .month], from: currentMonth)
         return components.year == 2024 && components.month == 1
@@ -225,21 +239,18 @@ struct OneDayView: View {
     private func fetchCategoriesForSelectedDate(date: String) {
         selectedDateString = date
     }
-    
+
     private func toggleTextField(for category: Category) {
         if showTextFieldForCategory == category {
-            // Hide the TextField if it was already shown for this category
             showTextFieldForCategory = nil
         } else {
-            // Show the TextField for the selected category
             showTextFieldForCategory = category
-            todoText = "" // Reset the text for the newly selected category
+            todoText = ""
         }
     }
-    
+
     private func saveTask(for category: Category) {
         guard !todoText.isEmpty else {
-            // Hide TextField if no text is entered
             showTextFieldForCategory = nil
             return
         }
@@ -253,13 +264,10 @@ struct OneDayView: View {
 
         do {
             try viewContext.save()
-            todoText = "" // Clear the TextField after saving
-
-            // Hide the TextField after saving a task
+            todoText = ""
             showTextFieldForCategory = nil
-
             print("Task saved: \(newTask.title ?? "")")
-            fetchTasksForToday() // Refresh the tasks after saving
+            fetchTasksForToday()
         } catch {
             print("Failed to save task: \(error.localizedDescription)")
         }
@@ -282,7 +290,7 @@ struct OneDayView: View {
             return []
         }
     }
-    
+
     private func toggleTaskCompletion(for task: Status) {
         task.isCompleted.toggle()
         if task.isCompleted {
@@ -293,17 +301,16 @@ struct OneDayView: View {
 
         do {
             try viewContext.save()
-            fetchTasksForToday() // Refresh the tasks after completion status change
+            fetchTasksForToday()
         } catch {
             print("Failed to toggle completion: \(error.localizedDescription)")
         }
     }
-    
+
     private func isTaskCompleted(for task: Status) -> Bool {
         return task.isCompleted
     }
 
-    // Helper function to select today's date on app launch
     private func selectTodayDate() {
         let today = Date()
         let formatter = DateFormatter()
@@ -313,13 +320,33 @@ struct OneDayView: View {
         fetchCategoriesForSelectedDate(date: selectedDateString)
     }
 
-    // Helper function to refresh tasks for today's date
     private func fetchTasksForToday() {
         fetchCategoriesForSelectedDate(date: selectedDateString)
     }
+
+    private func startEditingTask(_ task: Status) {
+        editingTask = task
+        editedTaskTitle = task.title ?? ""
+    }
+
+    private func saveEditedTask() {
+        guard let task = editingTask, !editedTaskTitle.isEmpty else {
+            editingTask = nil
+            return
+        }
+
+        task.title = editedTaskTitle
+        
+        do {
+            try viewContext.save()
+            print("Task updated: \(task.title ?? "")")
+            editingTask = nil
+            fetchTasksForToday()
+        } catch {
+            print("Failed to update task: \(error.localizedDescription)")
+        }
+    }
 }
-
-
 
 struct OneDayView_Previews: PreviewProvider {
     static var previews: some View {

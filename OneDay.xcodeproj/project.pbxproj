@@ -16,7 +16,6 @@
 		81B9EDB12C646ED6005299D6 /* ClockTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B9EDB02C646ED6005299D6 /* ClockTimeView.swift */; };
 		81B9EDB52C65ACED005299D6 /* CategoryModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 81B9EDB32C65ACED005299D6 /* CategoryModel.xcdatamodeld */; };
 		81B9EDE02C65C25A005299D6 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B9EDDF2C65C25A005299D6 /* PersistenceController.swift */; };
-		81B9EDE22C65CAD3005299D6 /* BackUpOneDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B9EDE12C65CAD3005299D6 /* BackUpOneDayView.swift */; };
 		81B9EE002C6E40B0005299D6 /* KNPSKkomi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 81B9EDFC2C6E40B0005299D6 /* KNPSKkomi.otf */; };
 		81B9EE012C6E40B0005299D6 /* MangoDdobak-R.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81B9EDFD2C6E40B0005299D6 /* MangoDdobak-R.ttf */; };
 		81B9EE022C6E40B0005299D6 /* SDSamliphopangcheTTFOutline.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81B9EDFE2C6E40B0005299D6 /* SDSamliphopangcheTTFOutline.ttf */; };
@@ -42,7 +41,6 @@
 		81B9EDB02C646ED6005299D6 /* ClockTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockTimeView.swift; sourceTree = "<group>"; };
 		81B9EDB42C65ACED005299D6 /* CategoryModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CategoryModel.xcdatamodel; sourceTree = "<group>"; };
 		81B9EDDF2C65C25A005299D6 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
-		81B9EDE12C65CAD3005299D6 /* BackUpOneDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpOneDayView.swift; sourceTree = "<group>"; };
 		81B9EDFB2C6E3FBE005299D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		81B9EDFC2C6E40B0005299D6 /* KNPSKkomi.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KNPSKkomi.otf; sourceTree = "<group>"; };
 		81B9EDFD2C6E40B0005299D6 /* MangoDdobak-R.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MangoDdobak-R.ttf"; sourceTree = "<group>"; };
@@ -73,7 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				81B9EDFF2C6E40B0005299D6 /* Font */,
-				81B9EDE12C65CAD3005299D6 /* BackUpOneDayView.swift */,
 				81B9EDDE2C65C231005299D6 /* ModelFile */,
 				81B9ED972C645742005299D6 /* OneDay */,
 				81B9ED962C645742005299D6 /* Products */,
@@ -238,7 +235,6 @@
 				81BF3FFE2C74339900C01183 /* Status+CoreDataClass.swift in Sources */,
 				81BF3FFF2C74339900C01183 /* Status+CoreDataProperties.swift in Sources */,
 				81B9ED992C645742005299D6 /* OneDayApp.swift in Sources */,
-				81B9EDE22C65CAD3005299D6 /* BackUpOneDayView.swift in Sources */,
 				81D4563B2C76FE15000E602C /* MonthView.swift in Sources */,
 				81B9EDAD2C646EC4005299D6 /* AddCategoryView.swift in Sources */,
 				81B9EDB12C646ED6005299D6 /* ClockTimeView.swift in Sources */,
