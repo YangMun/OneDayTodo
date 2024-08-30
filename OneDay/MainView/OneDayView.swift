@@ -122,15 +122,27 @@ struct OneDayView: View {
 
                                             Spacer()
 
-                                            Button(action: {
-                                                if editingTask == task {
+                                            if editingTask == task {
+                                                Button(action: {
                                                     saveEditedTask()
-                                                } else {
-                                                    startEditingTask(task)
+                                                }) {
+                                                    Image(systemName: "checkmark")
+                                                        .foregroundColor(.green)
                                                 }
-                                            }) {
-                                                Image(systemName: editingTask == task ? "checkmark" : "ellipsis")
-                                                    .foregroundColor(.primary)
+                                                
+                                                Button(action: {
+                                                    deleteTask(task)
+                                                }) {
+                                                    Image(systemName: "xmark")
+                                                        .foregroundColor(.red)
+                                                }
+                                            } else {
+                                                Button(action: {
+                                                    startEditingTask(task)
+                                                }) {
+                                                    Image(systemName: "ellipsis")
+                                                        .foregroundColor(.primary)
+                                                }
                                             }
                                         }
                                         .padding(.horizontal)
@@ -344,6 +356,19 @@ struct OneDayView: View {
             fetchTasksForToday()
         } catch {
             print("Failed to update task: \(error.localizedDescription)")
+        }
+    }
+
+    private func deleteTask(_ task: Status) {
+        viewContext.delete(task)
+        
+        do {
+            try viewContext.save()
+            print("Task deleted")
+            editingTask = nil
+            fetchTasksForToday()
+        } catch {
+            print("Failed to delete task: \(error.localizedDescription)")
         }
     }
 }
