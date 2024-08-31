@@ -4,6 +4,7 @@ struct MonthView: View {
     let month: Date
     @Binding var selectedDateString: String
     var onDateSelected: (String) -> Void
+    var completedDates: Set<String>
     
     var body: some View {
         VStack {
@@ -23,10 +24,28 @@ struct MonthView: View {
                         Text("\(Calendar.current.component(.day, from: date))")
                             .font(Font.custom("KNPSKkomi", size: 15, relativeTo: .body))
                             .frame(width: 40, height: 40)
-                            .background(selectedDateString == dateString ? Color.blue.opacity(0.5) : Color.blue.opacity(0.2))
+                            .background(
+                                Group {
+                                    if selectedDateString == dateString {
+                                        Color.blue.opacity(0.5)
+                                    } else if completedDates.contains(dateString) {
+                                        Color.green.opacity(0.3)
+                                    } else {
+                                        Color.blue.opacity(0.2)
+                                    }
+                                }
+                            )
                             .cornerRadius(8)
                             .foregroundColor(.primary)
                             .shadow(color: selectedDateString == dateString ? .blue : .gray, radius: selectedDateString == dateString ? 4 : 2, x: 0, y: 2)
+                            .overlay(
+                                completedDates.contains(dateString) ?
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 12))
+                                        .offset(x: 12, y: -12)
+                                    : nil
+                            )
                             .onTapGesture {
                                 onDateSelected(dateString)
                             }

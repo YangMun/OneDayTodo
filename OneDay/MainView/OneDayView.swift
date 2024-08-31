@@ -15,6 +15,8 @@ struct OneDayView: View {
     
     @State private var editingTask: Status?
     @State private var editedTaskTitle: String = ""
+    
+    @State private var completedDates: Set<String> = []
 
     var body: some View {
         NavigationView {
@@ -74,7 +76,7 @@ struct OneDayView: View {
                             }
                         }
 
-                        MonthView(month: currentMonth, selectedDateString: $selectedDateString, onDateSelected: fetchCategoriesForSelectedDate)
+                        MonthView(month: currentMonth, selectedDateString: $selectedDateString, onDateSelected: fetchCategoriesForSelectedDate, completedDates: completedDates)
 
                         if categories.isEmpty {
                             Text("카테고리가 없습니다.")
@@ -192,6 +194,10 @@ struct OneDayView: View {
                 currentMonth = getCurrentMonth()
                 trackUserID()
                 selectTodayDate()
+                loadCompletedDates()
+            }
+            .onDisappear {
+                saveCompletedDates()
             }
         }
     }
@@ -307,7 +313,11 @@ struct OneDayView: View {
         task.isCompleted.toggle()
         if task.isCompleted {
             task.selectedDate = Date()
+            let dateString = formattedDate(task.selectedDate!)
+            completedDates.insert(dateString)
         } else {
+            let dateString = formattedDate(task.selectedDate!)
+            completedDates.remove(dateString)
             task.selectedDate = nil
         }
 
@@ -370,6 +380,23 @@ struct OneDayView: View {
         } catch {
             print("Failed to delete task: \(error.localizedDescription)")
         }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+    
+    private func loadCompletedDates() {
+        if let savedDates = UserDefaults.standard.array(forKey: "CompletedDates") as? [String] {
+            completedDates = Set(savedDates)
+        }
+    }
+
+    private func saveCompletedDates() {
+        UserDefaults.standard.set(Array(completedDates), forKey: "CompletedDates")
     }
 }
 
